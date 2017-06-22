@@ -63,6 +63,39 @@ On average the maximum number of steps in a day occurs in the `r maxInd`^th^ 5 m
 
 ## Imputing missing values
 
+Missing values in the steps variable: `r sum(is.na(activity$steps))`
 
+```{r fillGaps}
+fillGap <- function(x) {
+    
+    if(is.na(x["steps"])) {
+        as.integer(activityInterval$steps[activityInterval$interval==as.integer(x["interval"])])
+    } else {
+        as.integer(x["steps"])
+    }
+    
+}
+
+activity2<-activity
+activity2$steps<-apply(activity,1,fillGap)
+
+activityDay2 <- aggregate(data=activity2[,1:2], .~date, sum)
+names(activityDay2) <- c("Date", "TotalSteps")
+hist(activityDay2$TotalSteps, breaks=10, main="Histogram of total steps per day", xlab="Number of steps per day")
+
+meanSteps <- mean(activityDay2$TotalSteps)
+medianSteps <- median(activityDay2$TotalSteps)
+
+summarySteps2 <- data.frame(Mean = mean(activityDay$TotalSteps), Median = median(activityDay$TotalSteps))
+names(summarySteps2) <- c("Mean Steps","Median Steps")
+kable(summarySteps2, align = "c", format = "html", table.attr = "style='width:40%;'",
+      caption = "Daily steps summary")
+
+
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+
+

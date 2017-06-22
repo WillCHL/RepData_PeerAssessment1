@@ -78,6 +78,53 @@ On average the maximum number of steps in a day occurs in the 104^th^ 5 minute i
 
 ## Imputing missing values
 
+Missing values in the steps variable: 2304
 
 
+```r
+fillGap <- function(x) {
+    
+    if(is.na(x["steps"])) {
+        activityInterval$steps[activityInterval$interval==as.integer(x["interval"])]
+    } else {
+        as.integer(x["steps"])
+    }
+    
+}
+
+activity2<-activity
+activity2$steps<-apply(activity,1,fillGap)
+
+activityDay2 <- aggregate(data=activity2[,1:2], .~date, sum)
+names(activityDay2) <- c("Date", "TotalSteps")
+hist(activityDay2$TotalSteps, breaks=10, main="Histogram of total steps per day", xlab="Number of steps per day")
+```
+
+![](PA1_template_files/figure-html/fillGaps-1.png)<!-- -->
+
+```r
+meanSteps <- mean(activityDay2$TotalSteps)
+medianSteps <- median(activityDay2$TotalSteps)
+
+summarySteps2 <- data.frame(Mean = mean(activityDay$TotalSteps), Median = median(activityDay$TotalSteps))
+names(summarySteps2) <- c("Mean Steps","Median Steps")
+kable(summarySteps2, align = "c", format = "html", table.attr = "style='width:40%;'",
+      caption = "Daily steps summary")
+```
+
+<table style='width:40%;'>
+<caption>Daily steps summary</caption>
+ <thead>
+  <tr>
+   <th style="text-align:center;"> Mean Steps </th>
+   <th style="text-align:center;"> Median Steps </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> 10766.19 </td>
+   <td style="text-align:center;"> 10765 </td>
+  </tr>
+</tbody>
+</table>
 ## Are there differences in activity patterns between weekdays and weekends?
