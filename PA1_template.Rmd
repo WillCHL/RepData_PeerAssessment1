@@ -8,6 +8,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
+library(ggplot2)
 ```
 
 ## Loading and preprocessing the data
@@ -17,6 +18,8 @@ Data is unzipped and the .csv file contained in the zip file is read into memory
 ```{r loadData}
 unzip("activity.zip")
 activity <- read.csv("activity.csv")
+activity$date <- as.Date(activity$date)
+# activity$time <- 
 ```
 
 ## What is mean total number of steps taken per day?
@@ -34,14 +37,29 @@ medianSteps <- median(activityDay$TotalSteps)
 
 summarySteps <- data.frame(Mean = mean(activityDay$TotalSteps), Median = median(activityDay$TotalSteps))
 names(summarySteps) <- c("Mean Steps","Median Steps")
-kable(summarySteps, align = "c", format = "html", table.attr = "style='width:40%;'")
+kable(summarySteps, align = "c", format = "html", table.attr = "style='width:40%;'",
+      caption = "Daily steps summary")
        
 ```
 
-
 ## What is the average daily activity pattern?
 
+```{r activityPattern}
 
+# activity<-merge(activity,activityDay,by.x="date", by.y="Date")
+
+activityInterval <- aggregate(data=activity[,c(1,3)], .~interval, mean)
+
+#plot(activity$interval,activity$steps, type='l')
+ggplot(activityInterval) + geom_line(aes(interval,steps)) + 
+    labs(title="Average daily activity level", x="5 minute interval", y="Average steps in interval")
+
+maxInd <- which.max(activityInterval$steps)
+maxInt <- activityInterval$interval[maxInd]
+maxTime <- paste(substr(maxInt,1,nchar(maxInt)-2),substr(maxInt,nchar(maxInt)-1,nchar(maxInt)), sep=":")
+```
+
+On average the maximum number of steps in a day occurs in the `r maxInd`^th^ 5 minute interval which is labelled as `r maxInt` or `r maxTime`.
 
 ## Imputing missing values
 
