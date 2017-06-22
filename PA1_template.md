@@ -85,7 +85,7 @@ Missing values in the steps variable: 2304
 fillGap <- function(x) {
     
     if(is.na(x["steps"])) {
-        activityInterval$steps[activityInterval$interval==as.integer(x["interval"])]
+        as.integer(activityInterval$steps[activityInterval$interval==as.integer(x["interval"])])
     } else {
         as.integer(x["steps"])
     }
@@ -127,4 +127,28 @@ kable(summarySteps2, align = "c", format = "html", table.attr = "style='width:40
   </tr>
 </tbody>
 </table>
+
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+```r
+wdays <- function(y) {
+    ydate <- as.Date(y["date"])
+    if (weekdays(ydate)=="Saturday" | weekdays(ydate)=="Sunday") {
+        2
+    } else {
+        1
+    }
+}
+
+activity2$wday <- factor(apply(activity2,1,wdays), labels = c("weekday", "weekend"))
+
+activityIntervalWday <- aggregate(data=activity2[,c(1,3,4)], .~interval+wday, mean)
+
+ggplot(activityIntervalWday) + geom_line(aes(interval,steps)) + facet_wrap("wday", ncol=1) +
+    labs(title="Average daily activity level", x="5 minute interval", y="Average steps in interval")
+```
+
+![](PA1_template_files/figure-html/weekdays-1.png)<!-- -->
+
+
